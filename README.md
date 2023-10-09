@@ -41,7 +41,7 @@ Step 4 - pack the folder and pkginfo with tar format;<br />
 Step 5 - install the tar file using 'bpkg install [file_path]' command and reboot.<br />
 After this, you can access your brand new applet via terminal.<br />
 
-## About this program
+## About This Program
 This is a command-line utility which is working at Magisk environment, it has been tested working
 fine with Magisk v26.3 and Android 13. But still, this utility does NOT responsible for any losses
 by using this program, please use it at your own risk.
