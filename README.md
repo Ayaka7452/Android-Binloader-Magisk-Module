@@ -1,5 +1,5 @@
 # Android Binaries Loader
-a command-line Magisk module that provides a simplified packager to load various executables to Android
+a Magisk module that provides a simplified command-line packager to load various binaries/scripts/executables into Android system
 
 ## What is this
 This is a command-line utilities for Android devices. It provides a packager(bpkg), which enables us to load various
@@ -13,8 +13,13 @@ Step 4 - Reboot and enjoy.<br />
 
 ## Usage
 bpkg + [Options] + [Parameters]<br />
-
-At terminal emulator(Termux is recommended), type 'bpkg help' to get more usage information
+Options:<br />
+install [path] - install a new package"<br />
+remove [path] - remove a installed package"<br />
+ls - list all installed packages"<br />
+ver - show blcore version information"<br />
+help - show this help screen"<br />
+Type 'bpkg help' at terminal emulator(Termux is recommended) to get more usage information.
 
 ## Make a Package
 ### Package Structure
