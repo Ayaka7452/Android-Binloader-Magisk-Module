@@ -14,7 +14,7 @@ Step 4 - Reboot and enjoy.<br />
 ## Usage
 bpkg + [Options] + [Parameters]<br />
 Options:<br />
-;install [path] - install a new package"<br />
+emsp; install [path] - install a new package"<br />
 ;remove [path] - remove a installed package"<br />
 ;ls - list all installed packages"<br />
 ;ver - show blcore version information"<br />
