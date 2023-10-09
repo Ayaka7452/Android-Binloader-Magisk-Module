@@ -1,0 +1,600 @@
+#!/bin/sh
+# Android Bin Loader
+# This program is able to load custom binaries or script files to the system using symlink.
+# Created by hdtune2k
+
+# Const values:
+# Init log file location:
+templog_path=/sdcard/blinit.log
+# Bin loader work path:
+defpath=/data/binloader
+mgdefpath=/data/adb/modules/binloader
+
+# Version Info:
+blcore_ver="1.3 release"
+
+# First deployment:
+function first_deploy() {
+ 
+ # Creates work directories:
+ mkdir $defpath
+ mkdir $defpath/mods
+ mkdir $defpath/configs
+ mkdir $defpath/tmp
+
+ # Installs Magisk module:
+ mkdir $mgdefpath
+ # write module.prop
+ echo "id=binloader" >> $mgdefpath/module.prop
+ echo "name=Android Binaries Loader" >> $mgdefpath/module.prop
+ echo "version=$blcore_ver" >> $mgdefpath/module.prop
+ echo "versionCode=1" >> $mgdefpath/module.prop
+ echo "author=hdt2k" >> $mgdefpath/module.prop
+ echo "description=Loads various executables into system systemlessly using terminal emulator" >> $mgdefpath/module.prop
+ echo "" >> $mgdefpath/auto_mount
+ # create module dirs:
+ mkdir $mgdefpath/system
+ mkdir $mgdefpath/system/bin
+
+ # self installation:
+ mv /data/adb/service.d/binloader.sh $mgdefpath/system/bin/binloader
+ chmod 0755 $mgdefpath/system/bin/binloader
+ ln -s $mgdefpath/system/bin/binloader $mgdefpath/system/bin/blcore
+ ln -s $mgdefpath/system/bin/binloader $mgdefpath/system/bin/bpkg
+ 
+ # Creates configs:
+ echo $defpath > $defpath/configs/defpath
+ # Set installed mark:
+ echo 1 > $defpath/configs/inststate
+ 
+}
+
+function strecho() {
+
+ case $1 in
+ vdone)
+  echo "loaded package metadata"
+ ;;
+ indone)
+  echo "package installed"
+ ;;
+ help)
+  echo "BINLOADER - A program that is able to load custom binaries to system."
+  echo "Usage: binloader (blcore/bpkg) [Options]"
+  echo "Options:"
+  echo "   install [path] - install a new package"
+  echo "   remove [path] - remove a installed package"
+  echo "   ls - list all installed packages"
+  echo "   ver - show blcore version information"
+  echo "   help - show this help documents."
+  echo "Powered by Ayaka7452"
+ ;;
+ rmdone)
+  echo "removed $2"
+ ;;
+ mklink)
+  echo "blcore version: $blcore_ver"
+  echo "shortcuts created"
+  echo "blcore initialized"
+ ;;
+ unpaked)
+  echo "package unpacked"
+  echo "reading package metadata..."
+ ;;
+ nopkginfo)
+  echo "err: provide a valid package"
+ ;;
+ noprogfiles)
+  echo "err: no program files found"
+ ;;
+ normtarget)
+  echo "err: no package specified"
+ ;;
+ noexec)
+  echo "err: no executables found"
+ ;;
+ bierr)
+  echo "err: batch installation failed"
+  echo "should not contain any invalid files in folder"
+ ;;
+ fnf)
+  echo "err: file not found"
+ ;;
+ pvf)
+  echo "err: metadata unreadable"
+ ;;
+ upakfail)
+  echo "installation failure"
+ ;;
+ pinfo)
+  echo package info:
+  echo name: $2
+  echo version: $3
+  echo executable: $4
+  echo exec name: $5
+  if [ "$6" == "skipcfm_avoidcode" ]; then
+   echo "confirmation is skipped ... started installation"
+   return 0
+  fi
+  if [ -n "$6" ]; then
+   echo startup: $6
+  fi
+  if [ "$7" == "skipcfm_avoidcode" ]; then
+   echo "confirmation is skipped ... started installation"
+   return 0
+  fi
+  # install confirmation:
+  echo -n "proceed installation?(y/n):"
+  read result
+  case $result in
+  y)
+   echo "installing package $2 ..."
+  ;;
+  n)
+   echo "aborted"
+   exit
+  ;;
+  *)
+   echo "err: invalid option"
+   exit
+  ;;
+  esac
+ ;;
+ inst_showinfo)
+  echo "unpacking package..."
+ ;;
+ pnf)
+  echo "err: no such packages found"
+ ;;
+ updconfirm)
+  
+  # Get info of installed pkg:
+  installed_ver=`cat $defpath/mods/$2/pkginfo|grep version|cut -d '[' -f2|cut -d ']' -f1`
+  echo "an old installation of this package is exist"
+  echo "installed version: $installed_ver"
+  echo "replacing version: $3"
+  if [ "$4" == "skipcfm_avoidcode" ]; then
+   echo "confirmation is skipped ... started installation"
+   return 0
+  fi
+  echo -n "update the exist package?(y/n):"
+  read rpres
+  case $rpres in
+  y)
+   echo "the old package has been removed"
+  ;;
+  n)
+   echo "aborted"
+   exit
+  ;;
+  *)
+   echo "err: invalid option"
+   exit
+  ;;
+  esac
+ ;;
+ rabnf)
+  echo "err: startup executables not found"
+ ;;
+ onlyrabins)
+  echo "info: this package only starts up while device is booting"
+  echo "package info:"
+  echo "name: $2"
+  echo "startup exec: $3"
+  if [ "$4" == "skipcfm_avoidcode" ]; then
+   echo "confirmation is skipped ... started installation"
+   return 0
+  fi
+  echo -n "proceed installation?(y/n):"
+  read rpres
+  case $rpres in
+  y)
+   echo "installing package ..."
+  ;;
+  n)
+   echo "aborted"
+   exit
+  ;;
+  *)
+   echo "err: invalid option"
+   exit
+  ;;
+  esac
+ ;;
+ rabdetect)
+  echo "boot script generated"
+ ;;
+ execnameerr)
+  echo "err: exec name not specified"
+ ;;
+ noinput)
+  echo "err: invalid option specified"
+  echo "type 'blcore help' to show help screen"
+ ;;
+ bipathe)
+  echo "error: folder is not exist"
+ ;;
+ bidetect)
+  echo "batch installation started"
+ ;;
+ bidone)
+  echo "batch installation completed"
+ ;;
+ batinst)
+  echo "installing package $2 ..."
+ ;;
+ biconfirm)
+  echo "batchinst mode will installing all packages with no confirmation"
+  echo "procceed?(y/n):"
+  read rpres
+  case $rpres in
+  y)
+   echo "installing package ..."
+  ;;
+  n)
+   echo "aborted"
+   exit
+  ;;
+  *)
+   echo "err: invalid choice"
+  ;;
+  esac
+ ;;
+  uninst_confirm)
+   echo "after this operation, binloader module and its mods and data will be removed"
+   echo -n "proceed?(y/n):"
+   read choi
+   case $choi in
+   y)
+    echo "uninstalling..."
+	  ;;
+   n)
+    echo "aborted"
+	   exit
+	  ;;
+   *)
+    echo "err: invalid choice"
+    exit
+   ;;
+   esac
+  ;;
+  uninst_done)
+   echo "uninstalled successfully"
+   exit
+  ;;
+ esac
+
+ # Exit detect:
+ case $2 in
+  exit)
+   exit 0
+  ;;
+ esac
+
+}
+
+function uninst_blcore() {
+
+ # uninstalls all files:
+ # confirmation
+ strecho uninst_confirm
+ 
+ # removes blcore work dir:
+ rm -rf /data/binloader
+ 
+ # remove module:
+ rm -rf /data/adb/modules/binloader
+ 
+ strecho uninst_done
+ 
+}
+
+function version() {
+ 
+ echo "blcore $blcore_ver "
+
+}
+
+# Install mod package to system
+function pkg_install() {
+
+ # Batch inst detect:
+ if [ "$2" == "skipcfm" ]; then
+  strecho ptmode
+  noconfirm="skipcfm_avoidcode"
+ fi
+
+ # Displays info:
+ strecho inst_showinfo
+
+ # Create installation work dir:
+ if [ ! -d $defpath/tmp/inst ]; then
+  mkdir $defpath/tmp/inst
+ elif [ -d $defpath/tmp/inst ]; then
+  rm -rf $defpath/tmp/inst
+  mkdir $defpath/tmp/inst
+ fi
+
+ # Check if available:
+ if [ ! -f $1 ]; then
+  if [ "$noconfirm" == "skipcfm_avoidcode" ]; then
+   echo "INST_FAIL_MARK"
+  fi
+  strecho fnf exit
+ fi
+
+ # Unpack package:
+ cd $defpath/tmp/inst # Change work dir to inst dir
+ cp $1 $defpath/tmp/inst/preinst.tar > /dev/null 2>/dev/null
+ tar -xvf $defpath/tmp/inst/preinst.tar > /dev/null 2>/dev/null
+
+ cd $defpath/tmp # Change it back
+ 
+ # Verify package:
+ # Check contents:
+ if [ ! -f $defpath/tmp/inst/pkginfo ]; then
+  if [ "$noconfirm" == "skipcfm_avoidcode" ]; then
+   echo "INST_FAIL_MARK"
+  fi
+  strecho nopkginfo
+  strecho upakfail exit
+ fi
+ if [ ! -d $defpath/tmp/inst/programs ]; then
+  strecho noprogfiles
+  strecho upakfail exit
+ fi
+ 
+  strecho unpaked
+ 
+ # Load pkginfo config:
+ pkgname=`cat $defpath/tmp/inst/pkginfo|grep pkgname|cut -d '[' -f2|cut -d ']' -f1`
+  strecho loadname
+ pkgversion=`cat $defpath/tmp/inst/pkginfo|grep version|cut -d '[' -f2|cut -d ']' -f1`
+  strecho loadver
+ execpath=`cat $defpath/tmp/inst/pkginfo|grep execpath|cut -d '[' -f2|cut -d ']' -f1`
+  strecho loadepath
+ execname=`cat $defpath/tmp/inst/pkginfo|grep execname|cut -d '[' -f2|cut -d ']' -f1`
+  strecho loadename
+ runatboot=`cat $defpath/tmp/inst/pkginfo|grep runatboot|cut -d '[' -f2|cut -d ']' -f1`
+
+ # Default only run at boot as false
+ onlyrab=0
+
+ # Verify pkginfo:
+ if [ ! -n "$pkgname" ]; then
+    strecho pvf exit
+ fi
+ if [ ! -n "$pkgversion" ]; then
+    strecho pvf exit
+ fi
+ if [ ! -n "$execpath" ]; then
+   if [ ! -n "$runatboot" ]; then
+    strecho pvf exit
+   fi
+ fi
+ # Execname and onlyrunatboot state check:
+ if [ ! -n "$execname" ]; then
+   # Exit when runatboot not exist
+   if [ ! -n "$runatboot" ]; then
+    strecho pvf exit
+   fi
+   # Exit when execpath without execname
+   if [ -n "$execpath" ]; then
+      strecho execnameerr exit
+   fi
+   onlyrab=1 # Only-run-at-boot package identify.
+ fi
+
+ # Executable path verify:
+ if [ ! -f $defpath/tmp/inst/programs/$execpath -a $onlyrab -eq 0 ]; then
+  strecho noexec
+  strecho upakfail exit
+ fi
+
+ # Onlyrab package installation:
+ if [ $onlyrab -eq 1 ]; then
+   if [ ! -f $defpath/tmp/inst/programs/$runatboot ]; then
+    strecho rabnf exit
+   fi
+   # Confirmation:
+   strecho onlyrabins $pkgname $runatboot $noconfirm
+    # Check if already installed:
+    if [ -d $defpath/mods/$pkgname ]; then
+     strecho updconfirm $pkgname $pkgversion $noconfirm
+     # Read old package info:
+     oldexecname=`cat $defpath/mods/$pkgname/pkginfo|grep execname|cut -d '[' -f2|cut -d ']' -f1`
+     # Removes old copies:
+     rm -rf $defpath/mods/$pkgname
+     if [ -L $mgdefpath/system/bin/$oldexecname ]; then
+      rm $mgdefpath/system/bin/$oldexecname
+     fi
+    fi
+   # Copy new files:
+   mkdir $defpath/mods/$pkgname
+   cp $defpath/tmp/inst/pkginfo $defpath/mods/$pkgname > /dev/null
+   cp -r $defpath/tmp/inst/programs/* $defpath/mods/$pkgname > /dev/null
+   chmod 0755 $defpath/mods/$pkgname/*
+   # Create runner:
+   echo "#!/bin/sh" >> /data/adb/service.d/BLMod_$pkgname.sh
+   echo "$defpath/mods/$pkgname/$runatboot" >> /data/adb/service.d/BLMod_$pkgname.sh
+   chmod 0755 /data/adb/service.d/BLMod_$pkgname.sh
+   strecho indone
+   return 0
+   # End of RaB installation
+ fi
+ # Note: if onlyrab package installed, program will exit till here.
+
+ # Normal package and normal runatboot package installation:
+ strecho vdone
+ # Confirmation:
+ strecho pinfo $pkgname $pkgversion $execpath $execname $runatboot $noconfirm
+
+ # Check if already installed:
+ if [ -d $defpath/mods/$pkgname ]; then
+  strecho updconfirm $pkgname $pkgversion $noconfirm
+  # Read old package info:
+  oldexecname=`cat $defpath/mods/$pkgname/pkginfo|grep execname|cut -d '[' -f2|cut -d ']' -f1`
+  # Removes old copies:
+  rm -rf $defpath/mods/$pkgname
+  if [ -L $mgdefpath/system/bin/$oldexecname ]; then
+   rm $mgdefpath/system/bin/$oldexecname
+  fi
+ fi
+
+ # Verify normal run at boot:
+ if [ -n "$runatboot" ]; then
+  strecho rabdetect
+  echo "#!/bin/sh" >> /data/adb/service.d/BLMod_$pkgname.sh
+  echo "$defpath/mods/$pkgname/$runatboot" >> /data/adb/service.d/BLMod_$pkgname.sh
+  chmod 0755 /data/adb/service.d/BLMod_$pkgname.sh
+ fi
+
+ # Install package into system:
+
+ # Create mod dir:
+ mkdir $defpath/mods/$pkgname
+ # Copy new files:
+ cp $defpath/tmp/inst/pkginfo $defpath/mods/$pkgname > /dev/null
+ cp -r $defpath/tmp/inst/programs/* $defpath/mods/$pkgname > /dev/null
+ # Create auto mount files:
+ ln -s $defpath/mods/$pkgname/$execpath $mgdefpath/system/bin/$execname
+ # Change perm:
+ chmod -R 0755 $defpath/mods/$pkgname/*
+
+ # removes installation files:
+ rm -rf $defpath/tmp/inst
+ 
+ strecho indone
+ # End of norm installation, program exits.
+
+}
+
+function batch_install() {
+
+ # Param 1 for batch installation path.
+ # Error checks:
+ if [ ! -d $1 ]; then
+  strecho bipathe exit
+ fi
+ 
+ strecho biconfirm
+ 
+ strecho bidetect
+ 
+ # batch inst loop:
+ for file in `ls $1`
+ do
+  strecho batinst $file
+  res=$(pkg_install $1/$file "skipcfm"|grep "INST_FAIL_MARK")
+  case $res in
+  "")
+   :
+   ;;
+  *)
+   strecho bierr exit
+   exit
+   ;;
+  esac
+ done
+ 
+ strecho bidone exit
+
+}
+
+function pkg_remove() {
+
+ # Errors check:
+ if [ $defpath$1 == $defpath ]; then
+  strecho normtarget exit
+ fi
+ 
+ # Check if package installed:
+ if [ ! -d $defpath/mods/$1 ]; then
+  strecho pnf exit
+ fi
+
+ # Check if runatboot enabled:
+ if [ -f /data/adb/service.d/BLMod_$1.sh ]; then
+   rm /data/adb/service.d/BLMod_$1.sh
+ fi
+ 
+ # fetches old execname
+ oldexecname=`cat $defpath/mods/$1/pkginfo|grep execname|cut -d '[' -f2|cut -d ']' -f1`
+
+ # Remove specified package:
+ rm -rf $defpath/mods/$1
+ if [ -L $mgdefpath/system/bin/$oldexecname ]; then
+  rm $mgdefpath/system/bin/$oldexecname 
+ fi
+
+ strecho rmdone $1
+
+}
+
+function re_deploy() {
+ 
+ # Force redeploy to reset all settings:
+ # Remove packages:
+ for pkgs in `ls $defpath/mods/`
+ do
+  pkg_remove $pkgs
+ done
+ 
+ # Remove old files:
+ rm -rf $defpath
+ # Redeploy:
+ first_deploy
+
+}
+
+function pkg_ls() {
+ 
+ # List installed packages:
+ ls $defpath/mods
+
+}
+
+# Main Program Area
+
+# Service.d Boot-install:
+if [ ! -d $mgdefpath ]; then
+  first_deploy
+fi
+
+# Check if blcore shortcut created:
+if [ ! -L $mgdefpath/system/bin/blcore -o ! -L $mgdefpath/system/bin/bpkg ]; then
+  ln -s $mgdefpath/system/bin/binloader $mgdefpath/system/bin/blcore 2>/dev/null
+  ln -s $mgdefpath/system/bin/binloader $mgdefpath/system/bin/bpkg 2>/dev/null
+  strecho mklink exit
+fi
+
+
+# CLI responder:
+case $1 in
+help)
+ strecho help
+;;
+install)
+ pkg_install $2
+;;
+batchinst)
+ batch_install $2
+;;
+remove)
+ pkg_remove $2
+;;
+ls)
+ pkg_ls
+;;
+ver)
+ version
+;;
+uninstall)
+ uninst_blcore
+;;
+*)
+ strecho noinput exit
+;;
+esac
+
+exit 0
