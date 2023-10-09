@@ -12,6 +12,8 @@ Step 3 - Launch terminal emulator app, and type 'binloader', it will be initiliz
 Step 4 - Reboot and enjoy.<br />
 
 ## Usage
-At terminal emulator(Termux is recommended), type 'bpkg help' to get usage information
+bpkg + [Options] + [Parameters]<br />
+
+At terminal emulator(Termux is recommended), type 'bpkg help' to get more usage information
 
 ## Make a Package
