@@ -2,7 +2,7 @@
 a Magisk module that provides a simplified command-line packager to load various binaries/scripts/executables into Android system
 
 ## What is this
-This is a command-line utilities for Android devices. It provides a packager(bpkg), which enables us to load various
+This is a command-line utility for Android devices. It provides a packager(bpkg), which enables us to load various
 useful utils with a simple package. With this, we are not needed to write a new Magisk module for a single script.
 
 ## Installation
