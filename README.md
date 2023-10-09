@@ -7,8 +7,11 @@ useful utils with a simple package. With this, we are not needed to write a new 
 
 ## Installation
 Step 1 - Download the latest flashable zip from Release page of this repo;
+
 Step 2 - Put the zip into the sdcard, and flash it via Magisk app;
+
 Step 3 - Launch terminal emulator app, and type 'binloader', it will be initilized;
+
 Step 4 - Reboot and enjoy.
 
 ## Usage
