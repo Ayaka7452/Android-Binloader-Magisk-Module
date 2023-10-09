@@ -17,3 +17,7 @@ bpkg + [Options] + [Parameters]<br />
 At terminal emulator(Termux is recommended), type 'bpkg help' to get more usage information
 
 ## Make a Package
+### Package Structure
+[Root]
+-/pkginfo-[
+-/programs
