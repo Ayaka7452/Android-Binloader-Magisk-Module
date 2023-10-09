@@ -14,11 +14,11 @@ Step 4 - Reboot and enjoy.<br />
 ## Usage
 bpkg + [Options] + [Parameters]<br />
 Options:<br />
-&emsp;install [path] - install a new package"<br />
-&emsp;remove [path] - remove a installed package"<br />
-&emsp;ls - list all installed packages"<br />
-&emsp;ver - show blcore version information"<br />
-&emsp;help - show this help screen"<br />
+;install [path] - install a new package"<br />
+;remove [path] - remove a installed package"<br />
+;ls - list all installed packages"<br />
+;ver - show blcore version information"<br />
+;help - show this help screen"<br />
 Type 'bpkg help' at terminal emulator(Termux is recommended) to get more usage information.
 
 ## Make a Package
