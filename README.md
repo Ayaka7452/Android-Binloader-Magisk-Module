@@ -27,7 +27,7 @@ Options:<br />
 ----pkginfo [file]<br />
 ### pkginfo File Content
 Total 4 tags of this metadata file, they are:<br />
-pkgname=[NAME OF YOUR_APPLET]<br />
+pkgname=[NAME_OF_YOUR_APPLET]<br />
 version=[APPLET_VERSION]<br />
 execpath=[custom_applet.sh]<br />
 execname=[NAME_OF_EXEC]<br />
