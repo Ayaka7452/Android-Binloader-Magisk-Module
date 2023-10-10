@@ -7,18 +7,18 @@ useful utils with a simple package. With this, we are not needed to write a new 
 
 ## Installation
 Step 1 - Download the latest flashable zip from Release page of this repo;<br />
-Step 2 - Put the zip into the sdcard, and flash it via Magisk app;<br />
+Step 2 - Put the zip into the sdcard, and flash it via Magisk app and reboot;<br />
 Step 3 - Launch terminal emulator app, and type 'binloader', it will be initilized;<br />
 Step 4 - Reboot and enjoy.<br />
 
 ## Usage
 bpkg + [Options] + [Parameters]<br />
 Options:<br />
->install [path] - install a new package"<br />
-    remove [path] - remove a installed package"<br />
-    ls - list all installed packages"<br />
-    ver - show blcore version information"<br />
-    help - show this help screen"<br />
+>install [path] - install a new package<br />
+    remove [path] - remove a installed package<br />
+    ls - list all installed packages<br />
+    ver - show blcore version information<br />
+    help - show this help screen<br />
 
 ## Make a Package
 ### Package Structure
