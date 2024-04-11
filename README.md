@@ -45,7 +45,7 @@ After this, you can access your brand new applet via terminal.<br />
 This is a command-line utility which is working at Magisk environment, it has been tested working
 fine with Magisk v26.3 and Android 13. But still, this utility does NOT responsible for any losses
 by using this program, please use it at your own risk.
-==================================================================================<br />
+***
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR<br />
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,<br />
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE<br />
@@ -53,8 +53,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER<br />
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,<br />
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE<br />
 SOFTWARE.<br />
-==================================================================================<br />
-
+***
 
 
 
